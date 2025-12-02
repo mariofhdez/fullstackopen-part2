@@ -20,7 +20,8 @@ const Content = ({ parts }) => {
 
 const Total = ({ parts }) => {
     return (
-        <p>Number of exercises {parts[0].exercises + parts[1].exercises + parts[2].exercises}</p>
+        <p style={{ fontWeight: 'bold' }}>
+            Total of {parts.reduce((sum, part) => sum + part.exercises, 0)} exercises</p>
     )
 }
 

@@ -7,7 +7,6 @@ function App() {
   const [newName, setNewName] = useState('')
 
   const handleNameChange = (e) => {
-    // console.log(e.target.value);
     setNewName(e.target.value)
   }
 
@@ -17,16 +16,22 @@ function App() {
       name: newName
     }
 
+    if(exists(newPerson) !== -1){
+      return alert(`${newPerson.name} is already added to phonebook`)
+    }
+
     setPersons(persons.concat(newPerson))
     setNewName('')
   }
+
+  const exists = (newPerson) => persons.findIndex(p => p.name === newPerson.name)
 
   return (
     <>
       <h2>Phonebook</h2>
       <form>
         <div>
-          name: <input onChange={handleNameChange} type="text" />
+          name: <input onChange={handleNameChange} value={newName} type="text" />
         </div>
         <div>
           <button type='submit' onClick={addPerson} >Add</button>

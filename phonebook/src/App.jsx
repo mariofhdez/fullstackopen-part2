@@ -32,25 +32,36 @@ function App() {
   // insert contact
   const addPerson = (newPerson) => {
 
-    const exists = (newPerson) => persons.findIndex(p => p.name === newPerson.name)
+    const person = persons.find(p => p.name === newPerson.name)
 
-    if (exists(newPerson) !== -1) {
-      return alert(`${newPerson.name} is already added to phonebook`)
+    if (typeof (person) === 'object') {
+      if (!confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
+        return
+      } else {
+        const changedPerson = { ...person, number: newPerson.number }
+        personService
+          .update(person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+            setContactsToShow(persons.map(p => p.id !== person.id ? p : returnedPerson))
+          })
+      }
+    } else {
+      personService
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setContactsToShow(persons.concat(returnedPerson))
+        })
     }
 
-    personService
-      .create(newPerson)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setContactsToShow(persons.concat(returnedPerson))
-      })
   }
 
   // delete person
   const deletePerson = (id) => {
     const person = persons.find(p => p.id === id)
     if (
-      !confirm(`Delete ${person?person.name:null}?`)
+      !confirm(`Delete ${person ? person.name : null}?`)
     ) {
       return
     }

@@ -24,7 +24,6 @@ function App() {
       setContactsToShow(persons)
     } else {
       setContactsToShow(persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())))
-      console.log(contactsToShow);
     }
   }
 
@@ -38,7 +37,12 @@ function App() {
       return alert(`${newPerson.name} is already added to phonebook`)
     }
 
-    setPersons(persons.concat(newPerson))
+    axios
+    .post('http://localhost:3001/persons', newPerson)
+    .then(response => {
+      setPersons(persons.concat(response.data))
+      setContactsToShow(persons.concat(response.data))
+    })
   }
 
 

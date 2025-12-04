@@ -8,7 +8,9 @@ import personService from './service/persons'
 
 function App() {
   const [persons, setPersons] = useState([])
+  const [contactsToShow, setContactsToShow] = useState([])
 
+  //initial data
   useEffect(() => {
     personService
       .getAll()
@@ -16,10 +18,9 @@ function App() {
         setPersons(initialPersons)
         setContactsToShow(initialPersons)
       })
-  },[])
+  }, [])
 
-  const [contactsToShow, setContactsToShow] = useState([])
-
+  // handler data to be showed
   const handleFilter = (filter) => {
     if (filter === "") {
       setContactsToShow(persons)
@@ -28,10 +29,9 @@ function App() {
     }
   }
 
-
   // insert contact
   const addPerson = (newPerson) => {
-    newPerson.id = persons.length + 1
+
     const exists = (newPerson) => persons.findIndex(p => p.name === newPerson.name)
 
     if (exists(newPerson) !== -1) {
@@ -39,11 +39,30 @@ function App() {
     }
 
     personService
-    .create( newPerson)
-    .then(returnedPerson => {
-      setPersons(persons.concat(returnedPerson))
-      setContactsToShow(persons.concat(returnedPerson))
-    })
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setContactsToShow(persons.concat(returnedPerson))
+      })
+  }
+
+  // delete person
+  const deletePerson = (id) => {
+    const person = persons.find(p => p.id === id)
+    if (
+      !confirm(`Delete ${person?person.name:null}?`)
+    ) {
+      return
+    }
+    personService
+      .destroy(id)
+      .then(response => {
+        setPersons(persons.filter(p => p.id !== id))
+        setContactsToShow(persons.filter(p => p.id !== id))
+      })
+      .catch(error => {
+        console.error("Error al eliminar:", error);
+      })
   }
 
 
@@ -54,7 +73,7 @@ function App() {
       <h2>Add a new contact</h2>
       <ContactForm onAdd={addPerson} persons={persons} />
       <h2>Contacts</h2>
-      <Contacts persons={contactsToShow} />
+      <Contacts persons={contactsToShow} onDelete={deletePerson} />
     </>
   )
 }
